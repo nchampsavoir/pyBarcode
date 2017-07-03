@@ -10,6 +10,12 @@ __docformat__ = 'restructuredtext en'
 
 from barcode.ean import EuropeanArticleNumber13
 
+# Python 3
+try:
+    reduce
+except NameError:
+    from functools import reduce
+
 
 class UniversalProductCodeA(EuropeanArticleNumber13):
     """Initializes new UPC-A barcode. Can be rendered as EAN-13 by passing
@@ -37,6 +43,19 @@ class UniversalProductCodeA(EuropeanArticleNumber13):
 
     def __unicode__(self):
         return self.upc
+
+    def calculate_checksum(self):
+        """Calculates the checksum for UPCA-Code.
+
+        :returns: The checksum for `self.ean`.
+        :rtype: Integer
+        """
+        def sum_(x, y):
+            return int(x) + int(y)
+
+        evensum = reduce(sum_, self.ean[::2])
+        oddsum = reduce(sum_, self.ean[1::2])
+        return (10 - ((evensum * 3 + oddsum) % 10)) % 10
 
     __str__ = __unicode__
 
